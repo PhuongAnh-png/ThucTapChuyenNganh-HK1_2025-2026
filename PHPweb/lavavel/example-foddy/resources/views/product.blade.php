@@ -48,16 +48,16 @@
                 <div class="col-lg-6 text-start text-lg-end wow slideInRight" data-wow-delay="0.1s">
                     <ul class="nav nav-pills d-inline-flex justify-content-end mb-5">
                         <li class="nav-item me-2">
-                            <a class="btn btn-outline-primary border-2 active" data-filter="*">All</a>
+                            <a href="#" role="button" class="btn btn-outline-primary border-2 active" data-filter="*">All</a>
                         </li>
                         <li class="nav-item me-2">
-                            <a class="btn btn-outline-primary border-2" data-filter=".category-1">Vegetable</a>
+                            <a href="#" role="button" class="btn btn-outline-primary border-2" data-filter=".category-4">Vegetable</a>
                         </li>
                         <li class="nav-item me-2">
-                            <a class="btn btn-outline-primary border-2" data-filter=".category-2">Fruits</a>
+                            <a href="#" role="button" class="btn btn-outline-primary border-2" data-filter=".category-5">Fruits</a>
                         </li>
                         <li class="nav-item me-0">
-                            <a class="btn btn-outline-primary border-2" data-filter=".category-3">Fresh</a>
+                            <a href="#" role="button" class="btn btn-outline-primary border-2" data-filter=".category-6">Fresh</a>
                         </li>
                     </ul>
                 </div>
@@ -66,7 +66,8 @@
                 <div id="tab-1" class="tab-pane fade show p-0 active">
                     <div class="row g-4">
                         @foreach($products as $item)
-                        <div class="col-xl-3 col-lg-4 col-md-6 product-col category-{{ $item->category_id }}" data-wow-delay="0.1s">
+                        @php $catId = $item->category_id ?? 0; @endphp
+                        <div class="col-xl-3 col-lg-4 col-md-6 product-col category-{{ $item->category_id }}">
                             <div class="product-item">
                                 <div class="position-relative bg-light overflow-hidden">
                                     <img class="img-fluid w-100" src="{{ product_image_url($item->image) }}" alt="{{ $item->name }}">
@@ -75,7 +76,6 @@
                                 <div class="text-center p-4">
                                     <a class="d-block h5 mb-2" href="">{{ $item->name }}</a>
                                     <span class="text-primary me-1">${{ $item->gia }}</span>
-                                    <!-- <span class="text-body text-decoration-line-through">$29.00</span> -->
                                 </div>
                                 <div class="d-flex border-top">
                                     <small class="w-50 text-center border-end py-2">
@@ -99,28 +99,54 @@
     document.addEventListener('DOMContentLoaded', function(){
         const buttons = document.querySelectorAll('.nav .btn[data-filter]');
         const items = document.querySelectorAll('.product-col');
+        const noResults = document.createElement('div');
+        noResults.className = 'text-center py-5 no-results d-none';
+        noResults.innerHTML = '<div class="alert alert-warning">Không có sản phẩm phù hợp.</div>';
+        const grid = document.querySelector('.tab-content .row');
+        if(grid) grid.parentNode.insertBefore(noResults, grid.nextSibling);
 
         function setActive(btn){
             buttons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         }
 
-        buttons.forEach(btn => {
-            btn.addEventListener('click', function(e){
-                e.preventDefault();
-                const filter = btn.getAttribute('data-filter');
-                setActive(btn);
-                if(filter === '*'){
-                    items.forEach(i => i.style.display = '');
-                    return;
-                }
+        function applyFilter(filter) {
+            let shown = 0;
+            if(filter === '*'){
+                items.forEach(i => { i.style.display = ''; shown++; });
+            } else {
                 const cls = filter.replace('.', '');
                 items.forEach(i => {
-                    if(i.classList.contains(cls)) i.style.display = '';
-                    else i.style.display = 'none';
+                    if(i.classList.contains(cls)) { i.style.display = ''; shown++; }
+                    else { i.style.display = 'none'; }
                 });
+            }
+            if(shown === 0) {
+                noResults.classList.remove('d-none');
+            } else {
+                noResults.classList.add('d-none');
+            }
+            console.debug('Filter applied:', filter, 'shown:', shown);
+        }
+
+        buttons.forEach(btn => {
+            // click
+            btn.addEventListener('click', function(e){
+                e.preventDefault();
+                setActive(btn);
+                applyFilter(btn.getAttribute('data-filter'));
+            });
+            // keyboard
+            btn.addEventListener('keydown', function(e){
+                if(e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    btn.click();
+                }
             });
         });
+
+        // initialize (show all)
+        applyFilter('*');
     });
     </script>
 
