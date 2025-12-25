@@ -1,9 +1,7 @@
 @extends('layout/app')
 
 
-@section('title', 'Foody - Feature')
-
-@section('content')
+@section('body')
 
     <!-- Page Header Start -->
     <div class="container-fluid page-header wow fadeIn" data-wow-delay="0.1s">
