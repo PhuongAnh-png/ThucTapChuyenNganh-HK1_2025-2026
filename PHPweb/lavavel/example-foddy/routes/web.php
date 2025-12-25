@@ -30,9 +30,14 @@ Route::get('/feature', function () {
     return view('feature');
 })->name('feature');
 
-Route::get('/product', function () {
-    return view('product');
-})->name('product');
+Route::get('/product', [ProductController::class, 'showProductsForUser'])->name('product');
+// Route::get('/product', function () {
+//     return view('product');
+// })->name('product');
+
+// Single product and category pages (public frontend)
+Route::get('/product/{id}', [App\Http\Controllers\HomeController::class, 'single_product'])->name('product.show');
+Route::get('/category/{id}', [App\Http\Controllers\HomeController::class, 'category_product'])->name('category.show');
 
 Route::get('/testimonial', function () {
     return view('testimonial');

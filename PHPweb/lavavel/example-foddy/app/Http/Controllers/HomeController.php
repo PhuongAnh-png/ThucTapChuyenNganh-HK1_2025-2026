@@ -31,21 +31,25 @@ class HomeController extends Controller
     public function home()
     {
         $categories = Category::all();
-        $products = Products::all();
+        $products = Products::where('status', 1)->get();
         return view('home', compact('categories', 'products'));
     }
 
     public function category_product($id)
     {
-        $products = Products::where('category_id', $id)->get();
+        $products = Products::where('category_id', $id)->where('status', 1)->get();
 
         return view('home.category_product', compact('products'));
     }
 
     public function single_product($id)
     {
-        $products = Products::where('id', $id)->firstOrFail();
+        $product = Products::where('id', $id)->firstOrFail();
 
-        return view('home.single_product', compact('products'));
+        return view('home.single_product', compact('product'));
+    }
+    public function product()
+    {
+        return view('product');
     }
 }

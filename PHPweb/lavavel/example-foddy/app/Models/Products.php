@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class Products extends Model
 {
     protected $table ="products";
-    protected $fillable = ['id', 'name', 'gia', 'image', 'category_id'];
+    // include 'status' so we can mass-assign it from admin forms
+    protected $fillable = ['id', 'name', 'gia', 'image', 'category_id', 'status'];
 
     protected $casts = [
         'gia' => 'float',
+        'status' => 'integer',
     ];
 
     public function category()

@@ -42,6 +42,17 @@
         </div>
 
         <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select name="status" id="status" class="form-select">
+                <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Active</option>
+                <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Inactive</option>
+            </select>
+            @error('status')
+                <div class="text-danger mt-1">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="mb-3">
             <label for="image" class="form-label">Product Image</label>
             <input type="file" class="form-control" id="image" name="image">
             @error('image')

@@ -9,13 +9,23 @@
         </a>
     </div>
 
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
+    @if($errors->any())
+        <div class="alert alert-danger">{{ implode(' ', $errors->all()) }}</div>
+    @endif
+
     <table class="table table-hover table-bordered">
         <thead class="table-dark">
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Image</th>
                 <th scope="col">Name</th>
+                <th scope="col">Category</th>
                 <th scope="col">Price</th>
+                <th scope="col">Status</th>
                 <th scope="col">Created At</th>
                 <th scope="col" class="text-center">Edit</th>
                 <th scope="col" class="text-center">Delete</th>
@@ -35,7 +45,17 @@
                 </td>
 
                 <td>{{ $object->name }}</td>
+                <td>
+                    <span class="badge bg-info text-dark">{{ $object->category->name ?? 'N/A' }}</span>
+                </td>
                 <td><strong>{{ number_format($object->gia, 0, ',', '.') }} $</strong></td>
+                <td>
+                    @if($object->status == 1)
+                        <span class="badge bg-success">Active</span>
+                    @else
+                        <span class="badge bg-secondary">Inactive</span>
+                    @endif
+                </td>
                 <td>{{ $object->created_at ? $object->created_at->format('d/m/Y') : 'N/A' }}</td>
 
                 <td class="text-center">
@@ -62,7 +82,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="7" class="text-center"><h4>Chưa có dữ liệu</h4></td>
+                <td colspan="9" class="text-center"><h4>Chưa có dữ liệu</h4></td>
             </tr>
             @endforelse
         </tbody>

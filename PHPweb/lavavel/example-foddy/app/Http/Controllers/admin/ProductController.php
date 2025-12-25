@@ -26,16 +26,17 @@ class ProductController extends Controller
             'name' => 'required|string',
             'gia' => 'required|numeric',
             'category_id' => 'nullable|exists:categories,id',
+            'status' => 'nullable|in:0,1',
             'image' => 'nullable|image|max:2048',
         ]);
 
-        // Accept legacy 'idCategory' as fallback until DB and clients are migrated
         $categoryId = $request->input('category_id') ?? $request->input('idCategory') ?? null;
 
         $data = [
             'name'        => $request->name,
             'gia'         => $request->gia,
             'category_id' => $categoryId,
+            'status'      => $request->input('status', 0),
         ];
 
         if ($request->hasFile('image')) {
@@ -65,37 +66,45 @@ class ProductController extends Controller
     {
         $product = Products::findOrFail($id);
 
+        // debug log
+        Log::info('Product update requested', ['id' => $id, 'input' => $request->all()]);
+
         $request->validate([
             'name' => 'required|string',
             'gia' => 'required|numeric',
             'category_id' => 'nullable|exists:categories,id',
+            'status' => 'required|in:0,1',
             'image' => 'nullable|image|max:2048',
         ]);
 
-        // Accept legacy 'idCategory' as fallback
         $categoryId = $request->input('category_id') ?? $request->input('idCategory') ?? null;
 
         $data = [
             'name'        => $request->name,
             'gia'         => $request->gia,
             'category_id' => $categoryId,
+            'status'      => $request->input('status', 0),
         ];
 
         if ($request->hasFile('image')) {
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
             }
-            $data['image'] = $request->file('image')->store('products', 'public');
+            $fileName = time() . '_' . $request->file('image')->getClientOriginalName();
+            $path = $request->file('image')->storeAs('products', $fileName, 'public');
+            $data['image'] = $path;
         }
 
         try {
             $product->update($data);
+            $product->refresh();
+            Log::info('Product updated successfully', ['id' => $product->id, 'product' => $product->toArray()]);
         } catch (\Exception $e) {
             Log::error('Failed to update product', ['error' => $e->getMessage(), 'data' => $data, 'id' => $id]);
             return back()->withInput()->withErrors('Unable to update product. Please check server logs.');
         }
 
-        return redirect()->route('admin.products.index')->with('success', 'Cập nhật thành công!');
+        return redirect()->route('admin.products.index')->with('success', 'Cập nhật thành công!' . $product->status);
     }
 
     public function destroy($id){
@@ -106,5 +115,25 @@ class ProductController extends Controller
         $product->delete();
 
         return redirect()->route('admin.products.index');
+    }
+
+    /**
+     * Public frontend method to show a product
+     */
+    public function frontendShow($id)
+    {
+        $product = Products::with('category')->findOrFail($id);
+        $related = Products::where('category_id', $product->category_id)
+                           ->where('id', '!=', $product->id)
+                           ->take(4)
+                           ->get();
+
+        return view('home.single_product', compact('product', 'related'));
+    }
+
+    public function showProductsForUser()
+    {
+        $products = Products::with('category')->where('status', 1)->orderBy('created_at', 'desc')->get();
+        return view('product', compact('products'));
     }
 }
