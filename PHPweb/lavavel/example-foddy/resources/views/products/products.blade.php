@@ -27,6 +27,7 @@
                 <th scope="col">Price</th>
                 <th scope="col">Status</th>
                 <th scope="col">Created At</th>
+                <th scope="col">Update Date</th>
                 <th scope="col" class="text-center">Edit</th>
                 <th scope="col" class="text-center">Delete</th>
             </tr>
@@ -56,7 +57,9 @@
                         <span class="badge bg-secondary">Inactive</span>
                     @endif
                 </td>
+
                 <td>{{ $object->created_at ? $object->created_at->format('d/m/Y') : 'N/A' }}</td>
+                <td>{{ $object->updated_at ? $object->updated_at->format('d/m/Y') : 'N/A' }}</td>
 
                 <td class="text-center">
                     <a href="{{ route('admin.products.edit', ['product' => $object->id]) }}">

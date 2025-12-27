@@ -87,11 +87,48 @@
                         <small class="fa fa-search text-body"></small>
                     </a>
                     <a class="btn-sm-square bg-white rounded-circle ms-3" href="">
-                        <small class="fa fa-user text-body"></small>
+                        <div class="d-none d-lg-flex ms-2">
+                            <a class="btn-sm-square bg-white rounded-circle ms-3" href="">
+                                <small class="fa fa-user text-body"></small>
+                            </a>
+                            <div class="nav-item dropdown">
+                                <a href="#" class="btn-sm-square bg-white rounded-circle ms-3 dropdown-toggle"data-bs-toggle="dropdown">
+                                    <small class="fa fa-user text-body"></small>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end m-0">
+                                    @guest
+                                        <a href="{{ route('login') }}" class="dropdown-item">Login</a>
+                                        @if (Route::has('register'))
+                                            <a href="{{ route('register') }}" class="dropdown-item">Register</a>
+                                        @endif
+                                    @else
+                                    <h6 class="dropdown-header text-primary">Hello, {{ Auth::user()->name }}</h6>
+                                    @if(Auth::user()->role === 'admin' || Auth::user()->role === 'user')
+                                        <a href="{{ route('admin') }}" class="dropdown-item text-danger">Admin</a>
+                                    @endif
+
+                                    <a href="#" class="dropdown-item">Đơn hàng của tôi</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="{{ route('logout') }}"
+                                        onclick="event.preventDefault(); document.getElementById('logout-form-main').submit();">
+                                        Logout
+                                    </a>
+                                    <form id="logout-form-main" action="{{ route('logout') }}" method="POST" class="d-none">
+                                        @csrf
+                                    </form>
+                                @endguest
+                            </div>
+                        </div>
                     </a>
-                    <a class="btn-sm-square bg-white rounded-circle ms-3" href="">
+                    @if(Route::has('cart.index'))
+                    <a class="btn-sm-square bg-white rounded-circle ms-3" href="{{ route('cart.index') }}">
                         <small class="fa fa-shopping-bag text-body"></small>
                     </a>
+                    @else
+                    <a class="btn-sm-square bg-white rounded-circle ms-3" href="#">
+                        <small class="fa fa-shopping-bag text-body"></small>
+                    </a>
+                    @endif
                 </div>
             </div>
         </nav>

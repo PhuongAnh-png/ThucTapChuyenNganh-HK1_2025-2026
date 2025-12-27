@@ -76,6 +76,7 @@
                                 <div class="text-center p-4">
                                     <a class="d-block h5 mb-2" href="">{{ $item->name }}</a>
                                     <span class="text-primary me-1">${{ $item->gia }}</span>
+                                    <span class="text-body text-decoration-line-through">$29</span>
                                 </div>
                                 <div class="d-flex border-top">
                                     <small class="w-50 text-center border-end py-2">
@@ -88,6 +89,9 @@
                             </div>
                         </div>
                         @endforeach
+                        <div class="col-12 text-center wow fadeInUp" data-wow-delay="0.1s">
+                            <a class="btn btn-primary rounded-pill py-3 px-5" href="">Browse More Products</a>
+                        </div>
                     </div>
                 </div>
             </div>

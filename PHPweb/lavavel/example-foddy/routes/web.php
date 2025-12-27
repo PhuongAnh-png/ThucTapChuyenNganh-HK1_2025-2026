@@ -4,10 +4,12 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\admin\CategoryController;
 use App\Http\Controllers\admin\ProductController;
+use App\Http\Controllers\admin\UserController;
 
 
 Route::get('/', function () {
-    return view('index');
+    $products = \App\Models\Products::with('category')->where('status', 1)->orderBy('created_at', 'desc')->take(8)->get();
+    return view('index', compact('products'));
 })->name('home');
 
 Route::get('/404', function () {
@@ -35,7 +37,7 @@ Route::get('/product', [ProductController::class, 'showProductsForUser'])->name(
 //     return view('product');
 // })->name('product');
 
-// Single product and category pages (public frontend)
+// Trang sản phẩm đơn lẻ và trang danh mục sản phẩm
 Route::get('/product/{id}', [App\Http\Controllers\HomeController::class, 'single_product'])->name('product.show');
 Route::get('/category/{id}', [App\Http\Controllers\HomeController::class, 'category_product'])->name('category.show');
 
@@ -44,27 +46,27 @@ Route::get('/testimonial', function () {
 })->name('testimonial');
 
 ////////////admin
-Route::get('/admin', function () {
-    return view('admin');
-})->name('admin');
+Auth::routes();
+
+// admin
+Route::get('/admin', [App\Http\Controllers\HomeController::class, 'index'])->middleware('auth')->name('admin');
 
 ///////////////////
 Route::get('/category/category', [\App\Http\Controllers\admin\CategoryController::class, 'index'])->name('category');
 
 Route::get('/products/products', [\App\Http\Controllers\admin\ProductController::class, 'index'])->name('products');
 ///////////////////
-Auth::routes();
-
-Route::get('/admin', [App\Http\Controllers\HomeController::class, 'index'])->middleware('auth')->name('admin');
 
 //////////////////////////
-Route::group(['prefix' => 'admin', 'as' => 'admin.'], function () {
-//Route::resource('category', App\Http\Controllers\admin\CategoryController::class);
-Route::resource('products', ProductController::class);
-Route::resource('category', CategoryController::class);
-// Route::resource('customer', App\Http\Controllers\admin\CustummerController::class);
-// Route::resource('user', App\Http\Controllers\admin\UserController::class);
-
+Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['auth','role:admin,staff']], function () {
+    // resources
+    Route::resource('products', ProductController::class);
+    Route::resource('category', CategoryController::class);
+    Route::resource('user', UserController::class);
+    // user
+    Route::resource('user', App\Http\Controllers\admin\UserController::class);
+    // customers (site customers separate from admin/staff users)
+    Route::get('customers', [App\Http\Controllers\admin\UserController::class, 'customers'])->name('customers.index');
 });
 
 

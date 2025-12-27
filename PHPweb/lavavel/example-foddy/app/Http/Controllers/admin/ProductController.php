@@ -133,7 +133,12 @@ class ProductController extends Controller
 
     public function showProductsForUser()
     {
+        // get categories (only active ones) for the frontend filter
+        $categories = Category::where('status', 1)->get();
+
+        // get frontend products (active, with active category relation)
         $products = Products::with('category')->where('status', 1)->orderBy('created_at', 'desc')->get();
-        return view('product', compact('products'));
+
+        return view('product', compact('products', 'categories'));
     }
 }

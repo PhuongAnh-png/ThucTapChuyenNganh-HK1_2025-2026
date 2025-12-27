@@ -75,7 +75,12 @@
 	          		<p style="color: #000;">600 kg available</p>
 	          	</div>
           	</div>
-          	<p><a href="{{ route('cart') }}" class="btn btn-black py-3 px-5">Add to Cart</a></p>
+           	@php $cartRoute = \Illuminate\Support\Facades\Route::has('cart') ? route('cart') : null; @endphp
+           	@if($cartRoute)
+           	    <p><a href="{{ $cartRoute }}" class="btn btn-black py-3 px-5">Add to Cart</a></p>
+            @else
+           	    <p><button type="button" class="btn btn-black py-3 px-5" disabled title="Cart unavailable">Add to Cart</button></p>
+            @endif
     			</div>
     		</div>
     	</div>
